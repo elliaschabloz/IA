@@ -65,12 +65,11 @@ main :-
 
 %*******************************************************************************
 affiche_solution(nil, _,_).
-affiche_solution(Pere, [[Pere,PereEtat,ActionPourEtat]|QReste],[F,H]) :- 
-	affiche_solution(PereEtat, QReste,[F,H]),
+affiche_solution(Pere, [[Pere,PereEtat,ActionPourEtat]|QReste],F) :- 
+	affiche_solution(PereEtat, QReste,F),
 	write("Action : "), write(ActionPourEtat),
-	write("  Etat : "), writeln(Pere),
-    write("F      : "), write(F),
-    write("H      : "), write(H).
+	write("  Etat : "), write(Pere),
+    write("   F   : "), writeln(F).
 
 affiche_solution(Pere, [[Etat,_,_]|QReste],_) :-
 	Pere \= Etat,
@@ -136,10 +135,10 @@ aetoile(Pf, Pu, _) :-
 % cas 2 : Si le noeud correspond à un état final, on a donc trouvé une solution et on peut l'afficher
 aetoile(Pf, Pu, Qs) :-
 	suppress_min([_, Umin], Pf, _),
-    suppress([Umin,[F,H,_],Pere,A], Pu, _),
+    suppress([Umin,[F,_,_],Pere,A], Pu, _),
     final_state(Umin),!,
 	append([[Umin,Pere,A]],Qs,QResult),
-    affiche_solution(Umin, QResult, [F,H]).  % on met le dernier ��tat comme le pere poru forcer l'affichage du dernier etat
+    affiche_solution(Umin, QResult, F).  % on met le dernier ��tat comme le pere poru forcer l'affichage du dernier etat
 
 % cas 3 (cas général) : on supprime le noeud correspondant à l'état à développer (valeur de F minimale) dans Pf, ainsi que son "frère" 
 % dans Pu ; puis on développe l'état U, en déterminant puis traitant chacun des successeurs   
