@@ -58,6 +58,7 @@ main :-
     insert([ [F0,H0,G0], S0 ],Pf0,Pf),
     insert([ S0, [F0,H0,G0], nil, nil ], Pu0,Pu),
     
+    
     % lancement de Aetoile
     aetoile(Pf,Pu,[]).
 
@@ -100,24 +101,24 @@ insert_if_necessary(_, [F,_,_],_,_, FPu,PuAvant, _, PfAvant, _, PuAvant, PfAvant
     FPu =< F.
 
 % on traite chaque noeud successeur avec loop_successors
-loop_successors([], _, Pu, Pf, Pu, Pf).
+loop_successors([], _,Pu, Pf, Pu, Pf).
 
 % si State est connu dans Q, alors on oublie cet état et on loop les suivants
 loop_successors([[State,_,_,_]| Rest], Q, Pu, Pf, Pu1, Pf1) :- 
-	member([State,_,_],Q),!,
+	belongs([State,_,_],Q),!,
     loop_successors(Rest, Q, Pu, Pf, Pu1, Pf1).
 
 % sinon, on verifie si State est dans Pu(et Pf) avec le supress  
 % supress renvoie faux si l'��l��ment �� supprimer n'existe pas.
 % on appelle ensuite insert_if_necessary pour réinsérer le terme avec la meilleure évaluation
 loop_successors([[State,[F,H,G],Umin,A]| Rest], Q, Pu, Pf, Pu1, Pf1) :- 
-    suppress(State,Pu,Pu2),!,
-    suppress(State, Pf, Pf2),
-    insert_if_necessary(State, [F,H,G],Umin,A, Pu, Pu2, Pf, Pf2, Pu3, Pf3),
+    suppress([State, [Fmin,Hmin,Gmin], _, _],Pu,Pu2), !,
+    suppress([[Fmin,Hmin,Gmin],State], Pf, Pf2),
+    insert_if_necessary(State, [F,H,G],Umin,A, Fmin, Pu, Pu2, Pf, Pf2, Pu3, Pf3),
     loop_successors(Rest, Q, Pu3, Pf3, Pu1, Pf1).  
 
 % sinon State est une nouvelle situation, on insère un nouveau terme dans Pu et Pf.
-loop_successors([[State,[F,H,G],Umin,A]| Rest], Q, Pu, Pf, Pu1, Pf1) :- 
+loop_successors([[State,[F,H,G],Umin,A]| Rest], Q, Pu, Pf, Pu1, Pf1) :-
     insert([State, [F,H,G], Umin, A ], Pu, PuPrime),
     insert([[F,H,G],State], Pf, PfPrime),
     loop_successors(Rest, Q, PuPrime, PfPrime, Pu1, Pf1).
