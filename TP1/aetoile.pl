@@ -60,7 +60,10 @@ main :-
     
     
     % lancement de Aetoile
-    aetoile(Pf,Pu,[]).
+    statistics(walltime, [_ | [_]]),
+    aetoile(Pf,Pu,[]),
+    statistics(walltime, [_ | [ExecutionTime]]),
+    write('Execution took '), write(ExecutionTime), write(' ms.'), nl.
 
 
 
