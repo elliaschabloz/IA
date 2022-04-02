@@ -44,7 +44,9 @@ adversaire(o,x).
 	 continuer a jouer (quel qu'il soit).
 	 ****************************************************/
 
-% situation_terminale(_Joueur, Situation) :-   ? ? ? ? ?
+situation_terminale(_Joueur, Situation) :- 
+	ground(Situation).
+
 
 	/***************************
 	DEFINITIONS D'UN ALIGNEMENT
@@ -72,8 +74,6 @@ colonneRecursif([E|Col], [Ligne|Reste], Rang) :-
 	colonneRecursif(Col, Reste, Rang).
 
 colonne(C,M) :-
-	%length(M,N),
-	%between(1,N,I),
 	colonneRecursif(C,M,_).
 
 
@@ -94,8 +94,6 @@ colonne(C,M) :-
 		
 diagonale(D, M) :- 
 	premiere_diag(1,D,M).
-
-	% deuxieme definition A COMPLETER
 	
 diagonale(D, M) :-
 	length(M,N),
@@ -108,7 +106,7 @@ premiere_diag(K,[E|D],[Ligne|M]) :-
 	K1 is K+1,
 	premiere_diag(K1,D,M).
 
-% seconde_diag(K,M,D) :- ? ? ? ?
+
 seconde_diag(_,[],[]).
 seconde_diag(K,[E|D],[Ligne|M]) :-
 	nth1(K,Ligne,E),
@@ -128,8 +126,7 @@ possible(  [],  _).
 	de chaque emplacement de la liste, mais il ne
 	faut pas realiser l'unification.
 	*/
-
-% A FAIRE 
+ 
 unifiable(X,J) :- 
 	(var(X) -> true; X=J).
 
@@ -159,10 +156,9 @@ possible pour J qui n'a aucun element encore libre.
 		
 	/* Un alignement perdant pour J est un alignement gagnant pour son adversaire. */
 
-% A FAIRE
-
 same([A|Reste],A) :- same(Reste,A).
 same([],_).
+
 alignement_gagnant(A, J) :- 
 	ground(A),
 	same(A,J).
@@ -183,7 +179,7 @@ alignement_perdant(Ali, J) :-
 	lorsqu'un joueur J joue en coordonnees [L,C]
 	*/	
 
-% A FAIRE
+
 %on verifie avec ground qu'a la position (L,C) il n'y a pas deja un coup deja joué
 successeur(J, Etat_Suivant,[L,C]) :-
 	nth1(L,Etat_Suivant,Lig), nth1(C,Lig, NonUnifie),
@@ -218,7 +214,7 @@ heuristique(J,Situation,H) :-		% cas 2
 % on ne vient ici que si les cut precedents n'ont pas fonctionne,
 % c-a-d si Situation n'est ni perdante ni gagnante.
 
-% A FAIRE 					cas 3
+% 				 					cas 3
 heuristique(J,Situation,H) :- 
 	adversaire(J,O),
 	findall(A, (alignement(A,Situation), possible(A, J)),LAJ),
@@ -227,4 +223,25 @@ heuristique(J,Situation,H) :-
 	length(LAO,CountO),
 	H is CountJ - CountO.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% TESTS %%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+/* Résultat attendu du test_1
+Ali=[a,b,c];
+Ali=[d,e,f];
+Ali=[g,h,i];
+Ali=[a,d,g];
+Ali=[b,e,h];
+Ali=[c,f,i];
+Ali=[a,e,i];
+Ali=[c,e,g];
+*/
+test_1(Ali) :- M = [[a,b,c], [d,e,f], [g,h,i]], alignement(Ali, M).
+
+/*
+test_2([_,_,_]) = true
+test_2([x,_,x]) = true
+test_2([_,o,x]) = false
+*/
+test_2(A) :- possible(A,x).

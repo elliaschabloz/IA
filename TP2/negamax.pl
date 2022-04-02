@@ -68,8 +68,9 @@ negamax(J, Etat, Pmax, Pmax, [rien, H]) :-
 	 SITUATION 2 : TABLEAU REMPLI
 	 *******************************************/
 
-negamax(J, Etat, _, _, [rien, H]) :-
-	ground(Etat),
+negamax(J, Etat, P, Pmax, [rien, H]) :-
+	P \= Pmax,
+	situation_terminale(J,Etat),
 	heuristique(J,Etat,H).	
 
 	/*******************************************
@@ -77,6 +78,8 @@ negamax(J, Etat, _, _, [rien, H]) :-
 	 *******************************************/
 
 negamax(J, Etat, P, Pmax, [CoupOpti, Valeur]) :-
+	P \= Pmax,
+	not(situation_terminale(J,Etat)),
 	successeurs(J,Etat,Succ),
 	loop_negamax(J,P,Pmax,Succ,ListeCouples),
 	meilleur(ListeCouples, [CoupOpti, ValeurOpti]),
@@ -140,16 +143,14 @@ A FAIRE : commenter chaque litteral de la 2eme clause de loop_negamax/5,
 	- le meilleur dans une liste [X|L] avec L \= [], est obtenu en comparant
 	  X et Y,le meilleur couple de L 
 	  Entre X et Y on garde celui qui a la petite valeur de V.
+*/
 
-A FAIRE : ECRIRE ici les clauses de meilleur/2
-	*/
 meilleur([[C,V]], [C,V]).
 meilleur([[C,V]|Reste], [CoupOpti,ValOpti]) :-
+	Reste \= [],
 	meilleur(Reste, [CoupMin,ValMin]),
-	(ValMin < V -> 	ValOpti = ValMin, CoupOpti = CoupMin ;
+	(ValMin =< V -> ValOpti = ValMin, CoupOpti = CoupMin ;
 					ValOpti = V,      CoupOpti = C).
-
-
 
 	/******************
   	PROGRAMME PRINCIPAL
@@ -168,4 +169,29 @@ A FAIRE :
 	Commentez les r�sultats obtenus.
 	*/
 
+etat1([[x,o,o],
+	   [x,o,x],
+	   [_,_,_]]).
 
+test_situ1(C,V,Pmax) :-
+	etat1(S),
+	joueur_initial(J),
+	negamax(J,S,6,Pmax,[C,V]).
+
+etat2([[o,x,o],
+	   [x,o,x],
+	   [o,x,_]]).
+
+test_situ2(C,V) :-
+	etat2(S),
+	joueur_initial(J),
+	negamax(J,S,8,9,[C,V]).
+
+etat3([[o,x,o],
+	   [x,o,x],
+	   [x,o,x]]).
+
+test_situ3(C,V) :-
+	etat3(S),
+	joueur_initial(J),
+	negamax(J,S,9,9,[C,V]).
